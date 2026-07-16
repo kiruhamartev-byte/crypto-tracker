@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Crypto Analyst</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Подключаем Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -304,6 +303,24 @@
             border-radius: 4px;
         }
 
+        .welcome-card {
+            background: #141424;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #1e1e32;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .welcome-card .greeting {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .welcome-card .sub {
+            font-size: 13px;
+            color: #666688;
+        }
+
         @media (max-width: 400px) {
             .price-card .value {
                 font-size: 18px;
@@ -328,6 +345,12 @@
 
     <!-- ========== СТРАНИЦА 1: ГЛАВНАЯ ========== -->
     <div class="page active" id="pageHome">
+        <!-- Приветствие -->
+        <div class="welcome-card">
+            <div class="greeting" id="welcomeGreeting">Добро пожаловать! 👋</div>
+            <div class="sub" id="welcomeSub">Ваш персональный крипто-аналитик</div>
+        </div>
+
         <div class="price-grid" id="priceGrid">
             <div class="price-card" id="btcCard">
                 <div class="coin">₿ Bitcoin</div>
@@ -345,14 +368,6 @@
             <h3>📈 Изменение цены BTC за 7 дней</h3>
             <canvas id="priceChart"></canvas>
             <button class="refresh-btn" onclick="fetchData()">🔄 Обновить</button>
-        </div>
-
-        <div class="stat-card" style="margin-top:4px;">
-            <div class="label">🎯 Цель: переезд в Москву</div>
-            <div class="num" id="goalProgress" style="font-size:18px;">15 000 / 100 000 ₽</div>
-            <div class="progress-bar" style="margin-top:8px;">
-                <div class="fill" id="goalFill" style="width:15%;"></div>
-            </div>
         </div>
     </div>
 
@@ -439,33 +454,28 @@
                     const data = window.Telegram.WebApp.initDataUnsafe;
                     if (data && data.user) {
                         tgUser = data.user;
-                        console.log('Пользователь из Telegram:', tgUser);
+                        console.log('👤 Пользователь из Telegram:', tgUser);
                         return tgUser;
                     }
                 }
-                // Если запущено не в Telegram — заглушка
-                tgUser = {
-                    id: 123456,
-                    first_name: 'Тест',
-                    last_name: 'Пользователь',
-                    username: 'test_user',
-                    language_code: 'ru',
-                    allows_write_to_pm: true,
-                };
-                return tgUser;
-            } catch (e) {
-                console.warn('Не удалось получить данные Telegram:', e);
+                // Заглушка, если не в Telegram
                 tgUser = {
                     id: 123456,
                     first_name: 'Гость',
+                    last_name: '',
                     username: 'guest',
+                    language_code: 'ru',
                 };
+                return tgUser;
+            } catch (e) {
+                console.warn('⚠️ Не удалось получить данные Telegram:', e);
+                tgUser = { id: 123456, first_name: 'Гость', username: 'guest' };
                 return tgUser;
             }
         }
 
         // ============================================================
-        // 1. НАСТРОЙКИ
+        // 1. НАСТРОЙКИ УРОВНЕЙ
         // ============================================================
         const LEVELS = [
             { name: 'Новичок', xpNeeded: 0 },
@@ -474,13 +484,10 @@
             { name: 'Ультра', xpNeeded: 20000 },
         ];
 
-        // Данные пользователя (сохраняются в localStorage по ID)
-        let userData = {
-            xp: 0,
-            trades: 0,
-            volume: 0,
-            profit: 0,
-        };
+        // ============================================================
+        // 2. РАБОТА С ДАННЫМИ (индивидуально по ID)
+        // ============================================================
+        let userData = { xp: 0, trades: 0, volume: 0, profit: 0 };
 
         function getStorageKey() {
             const id = tgUser ? tgUser.id : 'guest';
@@ -504,7 +511,7 @@
         }
 
         // ============================================================
-        // 2. УРОВНИ И XP
+        // 3. РАСЧЁТ УРОВНЕЙ
         // ============================================================
         function getLevel(xp) {
             let result = LEVELS[0];
@@ -531,18 +538,22 @@
         }
 
         // ============================================================
-        // 3. ОБНОВЛЕНИЕ UI
+        // 4. ОБНОВЛЕНИЕ ВСЕГО UI
         // ============================================================
         function updateProfile() {
             const level = getLevel(userData.xp);
             const next = getNextLevel(userData.xp);
 
-            // Имя пользователя из Telegram
+            // --- Имя ---
             const firstName = tgUser ? tgUser.first_name : 'Гость';
             const lastName = tgUser && tgUser.last_name ? ' ' + tgUser.last_name : '';
-            document.getElementById('userName').textContent = firstName + lastName;
+            const fullName = firstName + lastName;
+            document.getElementById('userName').textContent = fullName;
 
-            // Аватарка
+            // --- Приветствие на главной ---
+            document.getElementById('welcomeGreeting').textContent = `Привет, ${firstName}! 👋`;
+
+            // --- Аватар ---
             const avatarEl = document.getElementById('userAvatar');
             if (tgUser && tgUser.photo_url) {
                 avatarEl.innerHTML = `<img src="${tgUser.photo_url}" alt="avatar" />`;
@@ -550,17 +561,18 @@
                 avatarEl.textContent = firstName.charAt(0).toUpperCase() || '👤';
             }
 
-            // Уровень
+            // --- Уровень ---
             document.getElementById('userLevelDisplay').textContent = `📊 Уровень: ${level.name}`;
             document.getElementById('userLevelBadge').textContent = level.name;
             document.getElementById('userLevelBadge2').textContent = `⚡ ${userData.xp} XP`;
 
-            // Статистика
+            // --- Статистика ---
             document.getElementById('statTrades').textContent = userData.trades;
             document.getElementById('statVolume').textContent = `$${userData.volume.toLocaleString()}`;
-            document.getElementById('statProfit').textContent = `${userData.profit > 0 ? '+' : ''}${userData.profit}%`;
+            const profitSign = userData.profit > 0 ? '+' : '';
+            document.getElementById('statProfit').textContent = `${profitSign}${userData.profit}%`;
 
-            // Прогресс XP
+            // --- Прогресс XP ---
             const progress = getXpProgress(userData.xp);
             document.getElementById('xpFill').style.width = progress + '%';
             document.getElementById('xpCurrent').textContent = `${userData.xp} XP`;
@@ -568,20 +580,14 @@
             if (next) {
                 document.getElementById('xpNext').textContent = `${next.xpNeeded} XP`;
             } else {
-                document.getElementById('xpNext').textContent = 'MAX';
+                document.getElementById('xpNext').textContent = '🏆 MAX';
             }
-
-            // Обновляем цель на главной
-            const saved = 15000;
-            const target = 100000;
-            document.getElementById('goalProgress').textContent = `${saved.toLocaleString()} / ${target.toLocaleString()} ₽`;
-            document.getElementById('goalFill').style.width = Math.min((saved / target) * 100, 100) + '%';
 
             saveUserData();
         }
 
         // ============================================================
-        // 4. СИМУЛЯЦИЯ СДЕЛКИ
+        // 5. СИМУЛЯЦИЯ СДЕЛКИ
         // ============================================================
         function simulateTrade() {
             const xpGain = 50 + Math.floor(Math.random() * 30);
@@ -595,6 +601,7 @@
 
             updateProfile();
 
+            // Визуальный фидбек
             const btn = document.querySelector('.refresh-btn');
             const orig = btn.textContent;
             btn.textContent = `✅ +${xpGain} XP!`;
@@ -606,7 +613,7 @@
         }
 
         // ============================================================
-        // 5. КРИПТО-ДАННЫЕ
+        // 6. КРИПТО-ДАННЫЕ (API)
         // ============================================================
         let chartInstance = null;
 
@@ -651,8 +658,8 @@
 
             } catch (error) {
                 console.error('Ошибка:', error);
-                document.getElementById('btcPrice').textContent = 'Ошибка';
-                document.getElementById('ethPrice').textContent = 'Ошибка';
+                document.getElementById('btcPrice').textContent = '⚠️ Ошибка';
+                document.getElementById('ethPrice').textContent = '⚠️ Ошибка';
             }
         }
 
@@ -698,7 +705,7 @@
         }
 
         // ============================================================
-        // 6. НАВИГАЦИЯ
+        // 7. НАВИГАЦИЯ ПО ВКЛАДКАМ
         // ============================================================
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -712,16 +719,11 @@
         });
 
         // ============================================================
-        // 7. ЗАПУСК
+        // 8. ЗАПУСК
         // ============================================================
-        // Инициализируем пользователя Telegram
         initTelegramUser();
-
-        // Загружаем сохранённые данные (у каждого пользователя свои!)
         loadUserData();
         updateProfile();
-
-        // Загружаем цены
         fetchData();
         setInterval(fetchData, 5 * 60 * 1000);
     </script>
