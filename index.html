@@ -7,50 +7,59 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* ========== RESET & BASE ========== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
 
         body {
-            background: #0a0a14;
-            color: #e0e0e0;
+            background: #0a0a0f;
+            color: #e8e8f0;
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 72px;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* ========== ШАПКА ========== */
         .header {
-            padding: 20px 20px 12px;
+            padding: 18px 20px 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #0a0a14;
+            background: #0a0a0f;
             position: sticky;
             top: 0;
             z-index: 10;
         }
         .header h1 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f7931a, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #fff;
+        }
+        .header h1 span {
+            color: #7c3aed;
         }
         .header .badge {
-            font-size: 11px;
-            background: #1a1a2e;
+            font-size: 10px;
+            font-weight: 500;
+            background: #14141f;
             padding: 4px 12px;
             border-radius: 20px;
-            border: 1px solid #2a2a4a;
-            color: #8888aa;
+            border: 1px solid #1e1e30;
+            color: #7c3aed;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
 
+        /* ========== СТРАНИЦЫ ========== */
         .page {
             display: none;
             padding: 0 16px 20px;
-            animation: fade 0.3s ease;
+            animation: fade 0.25s ease;
         }
         .page.active {
             display: block;
@@ -59,7 +68,7 @@
         @keyframes fade {
             from {
                 opacity: 0;
-                transform: translateY(8px);
+                transform: translateY(6px);
             }
             to {
                 opacity: 1;
@@ -67,98 +76,131 @@
             }
         }
 
+        /* ========== ПРИВЕТСТВИЕ ========== */
+        .greeting {
+            padding: 20px 0 16px;
+        }
+        .greeting .name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .greeting .sub {
+            font-size: 13px;
+            color: #666688;
+            margin-top: 2px;
+        }
+
+        /* ========== ЦЕНЫ ========== */
         .price-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .price-card {
-            background: #141424;
-            border-radius: 14px;
-            padding: 16px;
-            border: 1px solid #1e1e32;
+            background: #111118;
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid #1a1a2a;
             text-align: center;
         }
         .price-card .coin {
-            font-size: 12px;
-            color: #666688;
+            font-size: 11px;
             font-weight: 500;
-            margin-bottom: 4px;
+            color: #666688;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
         }
         .price-card .value {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 20px;
+            font-weight: 600;
             color: #fff;
+            letter-spacing: -0.2px;
         }
         .price-card .change {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
         }
         .price-card .change.positive {
             color: #4caf50;
         }
         .price-card .change.negative {
-            color: #ff5252;
+            color: #ef4444;
         }
 
+        /* ========== ГРАФИК ========== */
         .chart-card {
-            background: #141424;
-            border-radius: 16px;
+            background: #111118;
+            border-radius: 12px;
             padding: 16px;
-            border: 1px solid #1e1e32;
+            border: 1px solid #1a1a2a;
             margin-bottom: 16px;
         }
-        .chart-card h3 {
-            font-size: 13px;
+        .chart-card .label {
+            font-size: 11px;
+            font-weight: 500;
             color: #666688;
-            font-weight: 400;
-            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
         canvas {
             width: 100% !important;
-            height: 180px !important;
+            height: 160px !important;
         }
 
-        .refresh-btn {
+        /* ========== КНОПКИ ========== */
+        .btn {
             width: 100%;
             padding: 10px;
-            margin-top: 10px;
-            background: #1e1e32;
+            background: #1a1a2a;
             border: none;
-            border-radius: 12px;
-            color: #aaa;
-            font-size: 13px;
+            border-radius: 10px;
+            color: #8888aa;
+            font-size: 12px;
+            font-weight: 500;
             cursor: pointer;
             transition: 0.2s;
+            letter-spacing: 0.3px;
         }
-        .refresh-btn:hover {
-            background: #2a2a4a;
+        .btn:hover {
+            background: #24243a;
             color: #fff;
         }
+        .btn-primary {
+            background: #7c3aed;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #6d28d9;
+        }
 
+        /* ========== ПРОФИЛЬ ========== */
         .profile-header {
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: #141424;
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid #1e1e32;
-            margin-bottom: 20px;
+            gap: 14px;
+            background: #111118;
+            border-radius: 12px;
+            padding: 16px 18px;
+            border: 1px solid #1a1a2a;
+            margin-bottom: 16px;
         }
         .avatar {
-            width: 56px;
-            height: 56px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #f7931a, #ffd700);
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: 700;
-            color: #0a0a14;
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
             overflow: hidden;
             flex-shrink: 0;
         }
@@ -168,107 +210,128 @@
             object-fit: cover;
         }
         .profile-info h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
+            color: #fff;
         }
         .profile-info .level {
-            font-size: 13px;
-            color: #f7931a;
+            font-size: 12px;
+            color: #7c3aed;
             font-weight: 500;
         }
         .profile-info .level-badge {
             display: inline-block;
-            background: #1a1a2e;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            border: 1px solid #2a2a4a;
-            margin-top: 4px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background: #141424;
-            border-radius: 14px;
-            padding: 14px;
-            border: 1px solid #1e1e32;
-            text-align: center;
-        }
-        .stat-card .num {
-            font-size: 20px;
-            font-weight: 700;
-            color: #fff;
-        }
-        .stat-card .label {
-            font-size: 11px;
-            color: #666688;
+            background: #14141f;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            border: 1px solid #1e1e30;
+            color: #8888aa;
             margin-top: 2px;
         }
 
+        /* ========== СТАТИСТИКА ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .stat-card {
+            background: #111118;
+            border-radius: 12px;
+            padding: 12px 14px;
+            border: 1px solid #1a1a2a;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.2px;
+        }
+        .stat-card .label {
+            font-size: 10px;
+            font-weight: 500;
+            color: #666688;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* ========== ПРОГРЕСС XP ========== */
         .progress-section {
-            background: #141424;
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid #1e1e32;
+            background: #111118;
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid #1a1a2a;
         }
         .progress-section .title {
-            font-size: 13px;
+            font-size: 11px;
+            font-weight: 500;
             color: #666688;
-            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .progress-bar {
             width: 100%;
-            height: 6px;
-            background: #1e1e32;
-            border-radius: 10px;
+            height: 4px;
+            background: #1a1a2a;
+            border-radius: 4px;
             overflow: hidden;
-            margin: 6px 0 8px;
+            margin: 6px 0 6px;
         }
         .progress-bar .fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #f7931a, #ffd700);
-            border-radius: 10px;
-            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #7c3aed, #4f46e5);
+            border-radius: 4px;
+            transition: width 0.4s ease;
         }
         .progress-labels {
             display: flex;
             justify-content: space-between;
-            font-size: 11px;
-            color: #444466;
+            font-size: 10px;
+            color: #555577;
+        }
+        .progress-labels span:first-child {
+            color: #8888aa;
         }
 
+        /* ========== ПУСТОЕ СОСТОЯНИЕ ========== */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #444466;
+            color: #555577;
         }
         .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
+            font-size: 36px;
+            margin-bottom: 10px;
+            opacity: 0.5;
         }
         .empty-state h3 {
             color: #8888aa;
             font-weight: 400;
-            font-size: 16px;
+            font-size: 15px;
+        }
+        .empty-state p {
+            font-size: 12px;
+            margin-top: 4px;
         }
 
+        /* ========== НАВИГАЦИЯ ========== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #0d0d1a;
-            border-top: 1px solid #1a1a2e;
+            background: #0a0a0f;
+            border-top: 1px solid #14141f;
             display: flex;
             justify-content: space-around;
-            padding: 8px 0 12px;
-            backdrop-filter: blur(12px);
+            padding: 6px 0 10px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             z-index: 20;
         }
         .nav-item {
@@ -278,18 +341,21 @@
             background: none;
             border: none;
             color: #444466;
-            font-size: 10px;
+            font-size: 9px;
+            font-weight: 500;
             cursor: pointer;
             transition: 0.2s;
-            padding: 4px 16px;
+            padding: 4px 12px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
             position: relative;
         }
         .nav-item .icon {
-            font-size: 22px;
-            margin-bottom: 2px;
+            font-size: 20px;
+            margin-bottom: 1px;
         }
         .nav-item.active {
-            color: #f7931a;
+            color: #7c3aed;
         }
         .nav-item.active::after {
             content: '';
@@ -297,40 +363,25 @@
             top: -1px;
             left: 50%;
             transform: translateX(-50%);
-            width: 20px;
+            width: 16px;
             height: 2px;
-            background: #f7931a;
+            background: #7c3aed;
             border-radius: 4px;
         }
 
-        .welcome-card {
-            background: #141424;
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid #1e1e32;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-        .welcome-card .greeting {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .welcome-card .sub {
-            font-size: 13px;
-            color: #666688;
-        }
-
+        /* ========== АДАПТИВ ========== */
         @media (max-width: 400px) {
             .price-card .value {
-                font-size: 18px;
-            }
-            .profile-header {
-                flex-direction: row;
-                text-align: left;
+                font-size: 17px;
             }
             .stats-grid {
-                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card .num {
+                font-size: 16px;
+            }
+            .profile-header {
+                padding: 14px 16px;
             }
         }
     </style>
@@ -339,35 +390,34 @@
 
     <!-- ========== ШАПКА ========== -->
     <div class="header">
-        <h1>📊 Crypto Analyst</h1>
+        <h1>Crypto<span>Analyst</span></h1>
         <span class="badge" id="userLevelBadge">Новичок</span>
     </div>
 
     <!-- ========== СТРАНИЦА 1: ГЛАВНАЯ ========== -->
     <div class="page active" id="pageHome">
-        <!-- Приветствие -->
-        <div class="welcome-card">
-            <div class="greeting" id="welcomeGreeting">Добро пожаловать! 👋</div>
-            <div class="sub" id="welcomeSub">Ваш персональный крипто-аналитик</div>
+        <div class="greeting">
+            <div class="name" id="welcomeGreeting">Привет</div>
+            <div class="sub">Актуальные котировки</div>
         </div>
 
-        <div class="price-grid" id="priceGrid">
+        <div class="price-grid">
             <div class="price-card" id="btcCard">
-                <div class="coin">₿ Bitcoin</div>
+                <div class="coin">Bitcoin</div>
                 <div class="value" id="btcPrice">—</div>
                 <div class="change" id="btcChange">—</div>
             </div>
             <div class="price-card" id="ethCard">
-                <div class="coin">⟠ Ethereum</div>
+                <div class="coin">Ethereum</div>
                 <div class="value" id="ethPrice">—</div>
                 <div class="change" id="ethChange">—</div>
             </div>
         </div>
 
         <div class="chart-card">
-            <h3>📈 Изменение цены BTC за 7 дней</h3>
+            <div class="label">BTC / USD — 7 дней</div>
             <canvas id="priceChart"></canvas>
-            <button class="refresh-btn" onclick="fetchData()">🔄 Обновить</button>
+            <button class="btn" onclick="fetchData()" style="margin-top:10px;">Обновить</button>
         </div>
     </div>
 
@@ -376,8 +426,8 @@
         <div class="profile-header">
             <div class="avatar" id="userAvatar">👤</div>
             <div class="profile-info">
-                <h2 id="userName">Загрузка...</h2>
-                <div class="level" id="userLevelDisplay">📊 Уровень: Новичок</div>
+                <h2 id="userName">Загрузка</h2>
+                <div class="level" id="userLevelDisplay">Уровень: Новичок</div>
                 <span class="level-badge" id="userLevelBadge2">⚡ 0 XP</span>
             </div>
         </div>
@@ -385,24 +435,24 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="num" id="statTrades">0</div>
-                <div class="label">📊 Сделок</div>
+                <div class="label">Сделок</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="statVolume">0$</div>
-                <div class="label">💰 Объём продаж</div>
+                <div class="label">Объём</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="statProfit">+0%</div>
-                <div class="label">📈 Прибыль</div>
+                <div class="label">Прибыль</div>
             </div>
             <div class="stat-card">
                 <div class="num" id="statRank">#1</div>
-                <div class="label">🏆 Рейтинг</div>
+                <div class="label">Рейтинг</div>
             </div>
         </div>
 
         <div class="progress-section">
-            <div class="title">⬆ Прогресс до следующего уровня</div>
+            <div class="title">Прогресс до следующего уровня</div>
             <div class="progress-bar">
                 <div class="fill" id="xpFill" style="width:0%;"></div>
             </div>
@@ -412,17 +462,17 @@
             </div>
         </div>
 
-        <button class="refresh-btn" onclick="simulateTrade()" style="margin-top:16px;">
-            📈 Симулировать сделку (+50 XP)
+        <button class="btn btn-primary" onclick="simulateTrade()" style="margin-top:14px;">
+            Симулировать сделку +50 XP
         </button>
     </div>
 
     <!-- ========== СТРАНИЦА 3: ПОРТФЕЛЬ ========== -->
     <div class="page" id="pagePortfolio">
         <div class="empty-state">
-            <div class="icon">💼</div>
-            <h3>Портфель пока пуст</h3>
-            <p style="color:#444466;font-size:13px;margin-top:4px;">Совершайте сделки, чтобы наполнить его</p>
+            <div class="icon">📂</div>
+            <h3>Портфель пуст</h3>
+            <p>Совершите первую сделку</p>
         </div>
     </div>
 
@@ -454,28 +504,19 @@
                     const data = window.Telegram.WebApp.initDataUnsafe;
                     if (data && data.user) {
                         tgUser = data.user;
-                        console.log('👤 Пользователь из Telegram:', tgUser);
                         return tgUser;
                     }
                 }
-                // Заглушка, если не в Telegram
-                tgUser = {
-                    id: 123456,
-                    first_name: 'Гость',
-                    last_name: '',
-                    username: 'guest',
-                    language_code: 'ru',
-                };
+                tgUser = { id: 123456, first_name: 'Гость', last_name: '', username: 'guest' };
                 return tgUser;
             } catch (e) {
-                console.warn('⚠️ Не удалось получить данные Telegram:', e);
                 tgUser = { id: 123456, first_name: 'Гость', username: 'guest' };
                 return tgUser;
             }
         }
 
         // ============================================================
-        // 1. НАСТРОЙКИ УРОВНЕЙ
+        // 1. УРОВНИ
         // ============================================================
         const LEVELS = [
             { name: 'Новичок', xpNeeded: 0 },
@@ -485,34 +526,25 @@
         ];
 
         // ============================================================
-        // 2. РАБОТА С ДАННЫМИ (индивидуально по ID)
+        // 2. ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (localStorage по ID)
         // ============================================================
         let userData = { xp: 0, trades: 0, volume: 0, profit: 0 };
 
         function getStorageKey() {
-            const id = tgUser ? tgUser.id : 'guest';
-            return 'cryptoAnalyst_' + id;
+            return 'cryptoAnalyst_' + (tgUser ? tgUser.id : 'guest');
         }
 
         function loadUserData() {
-            const key = getStorageKey();
-            const saved = localStorage.getItem(key);
+            const saved = localStorage.getItem(getStorageKey());
             if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    userData = { ...userData, ...parsed };
-                } catch (e) {}
+                try { userData = { ...userData, ...JSON.parse(saved) }; } catch (e) {}
             }
         }
 
         function saveUserData() {
-            const key = getStorageKey();
-            localStorage.setItem(key, JSON.stringify(userData));
+            localStorage.setItem(getStorageKey(), JSON.stringify(userData));
         }
 
-        // ============================================================
-        // 3. РАСЧЁТ УРОВНЕЙ
-        // ============================================================
         function getLevel(xp) {
             let result = LEVELS[0];
             for (const lv of LEVELS) {
@@ -538,56 +570,42 @@
         }
 
         // ============================================================
-        // 4. ОБНОВЛЕНИЕ ВСЕГО UI
+        // 3. ОБНОВЛЕНИЕ UI
         // ============================================================
         function updateProfile() {
             const level = getLevel(userData.xp);
             const next = getNextLevel(userData.xp);
-
-            // --- Имя ---
             const firstName = tgUser ? tgUser.first_name : 'Гость';
-            const lastName = tgUser && tgUser.last_name ? ' ' + tgUser.last_name : '';
-            const fullName = firstName + lastName;
-            document.getElementById('userName').textContent = fullName;
 
-            // --- Приветствие на главной ---
-            document.getElementById('welcomeGreeting').textContent = `Привет, ${firstName}! 👋`;
+            document.getElementById('userName').textContent = firstName;
+            document.getElementById('welcomeGreeting').textContent = `Привет, ${firstName}`;
 
-            // --- Аватар ---
-            const avatarEl = document.getElementById('userAvatar');
+            const avatar = document.getElementById('userAvatar');
             if (tgUser && tgUser.photo_url) {
-                avatarEl.innerHTML = `<img src="${tgUser.photo_url}" alt="avatar" />`;
+                avatar.innerHTML = `<img src="${tgUser.photo_url}" alt="" />`;
             } else {
-                avatarEl.textContent = firstName.charAt(0).toUpperCase() || '👤';
+                avatar.textContent = firstName.charAt(0).toUpperCase();
             }
 
-            // --- Уровень ---
-            document.getElementById('userLevelDisplay').textContent = `📊 Уровень: ${level.name}`;
+            document.getElementById('userLevelDisplay').textContent = `Уровень: ${level.name}`;
             document.getElementById('userLevelBadge').textContent = level.name;
             document.getElementById('userLevelBadge2').textContent = `⚡ ${userData.xp} XP`;
 
-            // --- Статистика ---
             document.getElementById('statTrades').textContent = userData.trades;
             document.getElementById('statVolume').textContent = `$${userData.volume.toLocaleString()}`;
-            const profitSign = userData.profit > 0 ? '+' : '';
-            document.getElementById('statProfit').textContent = `${profitSign}${userData.profit}%`;
+            const sign = userData.profit > 0 ? '+' : '';
+            document.getElementById('statProfit').textContent = `${sign}${userData.profit}%`;
 
-            // --- Прогресс XP ---
             const progress = getXpProgress(userData.xp);
             document.getElementById('xpFill').style.width = progress + '%';
             document.getElementById('xpCurrent').textContent = `${userData.xp} XP`;
-
-            if (next) {
-                document.getElementById('xpNext').textContent = `${next.xpNeeded} XP`;
-            } else {
-                document.getElementById('xpNext').textContent = '🏆 MAX';
-            }
+            document.getElementById('xpNext').textContent = next ? `${next.xpNeeded} XP` : 'MAX';
 
             saveUserData();
         }
 
         // ============================================================
-        // 5. СИМУЛЯЦИЯ СДЕЛКИ
+        // 4. СИМУЛЯЦИЯ
         // ============================================================
         function simulateTrade() {
             const xpGain = 50 + Math.floor(Math.random() * 30);
@@ -600,20 +618,18 @@
             userData.profit = Math.min(Math.max(userData.profit + parseFloat(profitChange), -20), 50);
 
             updateProfile();
-
-            // Визуальный фидбек
-            const btn = document.querySelector('.refresh-btn');
+            const btn = document.querySelector('.btn-primary');
             const orig = btn.textContent;
-            btn.textContent = `✅ +${xpGain} XP!`;
-            btn.style.background = '#2a4a2a';
+            btn.textContent = `+${xpGain} XP`;
+            btn.style.background = '#2a2a4a';
             setTimeout(() => {
                 btn.textContent = orig;
-                btn.style.background = '#1e1e32';
-            }, 1200);
+                btn.style.background = '#7c3aed';
+            }, 1000);
         }
 
         // ============================================================
-        // 6. КРИПТО-ДАННЫЕ (API)
+        // 5. КРИПТО API
         // ============================================================
         let chartInstance = null;
 
@@ -657,9 +673,8 @@
                 renderChart(dates, prices);
 
             } catch (error) {
-                console.error('Ошибка:', error);
-                document.getElementById('btcPrice').textContent = '⚠️ Ошибка';
-                document.getElementById('ethPrice').textContent = '⚠️ Ошибка';
+                document.getElementById('btcPrice').textContent = '⚠️ Error';
+                document.getElementById('ethPrice').textContent = '⚠️ Error';
             }
         }
 
@@ -672,14 +687,14 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'BTC (USD)',
+                        label: 'BTC',
                         data: data,
-                        borderColor: '#f7931a',
-                        backgroundColor: 'rgba(247, 147, 26, 0.08)',
+                        borderColor: '#7c3aed',
+                        backgroundColor: 'rgba(124, 58, 237, 0.06)',
                         fill: true,
                         tension: 0.3,
                         pointRadius: 2,
-                        pointBackgroundColor: '#f7931a',
+                        pointBackgroundColor: '#7c3aed',
                     }]
                 },
                 options: {
@@ -687,17 +702,17 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            labels: { color: '#666688', font: { size: 10 } }
+                            labels: { color: '#666688', font: { size: 9 } }
                         }
                     },
                     scales: {
                         x: {
-                            ticks: { color: '#444466', font: { size: 9 } },
-                            grid: { color: 'rgba(255,255,255,0.03)' }
+                            ticks: { color: '#444466', font: { size: 8 } },
+                            grid: { color: 'rgba(255,255,255,0.02)' }
                         },
                         y: {
-                            ticks: { color: '#444466', font: { size: 9 } },
-                            grid: { color: 'rgba(255,255,255,0.03)' }
+                            ticks: { color: '#444466', font: { size: 8 } },
+                            grid: { color: 'rgba(255,255,255,0.02)' }
                         }
                     }
                 }
@@ -705,27 +720,30 @@
         }
 
         // ============================================================
-        // 7. НАВИГАЦИЯ ПО ВКЛАДКАМ
+        // 6. НАВИГАЦИЯ
         // ============================================================
         document.querySelectorAll('.nav-item').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-
-                const pageId = this.dataset.page;
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById(pageId).classList.add('active');
+                document.getElementById(this.dataset.page).classList.add('active');
             });
         });
 
         // ============================================================
-        // 8. ЗАПУСК
+        // 7. ЗАПУСК
         // ============================================================
         initTelegramUser();
         loadUserData();
         updateProfile();
         fetchData();
         setInterval(fetchData, 5 * 60 * 1000);
+
+        // Затемняем фон приложения в Telegram (опционально)
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.setBackgroundColor('#0a0a0f');
+        }
     </script>
 
 </body>
