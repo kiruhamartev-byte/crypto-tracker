@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Crypto Analyst</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Подключаем Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,7 +22,6 @@
             padding-bottom: 80px;
         }
 
-        /* --- ШАПКА --- */
         .header {
             padding: 20px 20px 12px;
             display: flex;
@@ -47,7 +48,6 @@
             color: #8888aa;
         }
 
-        /* --- КОНТЕЙНЕРЫ СТРАНИЦ --- */
         .page {
             display: none;
             padding: 0 16px 20px;
@@ -68,7 +68,6 @@
             }
         }
 
-        /* --- ГЛАВНАЯ (графики) --- */
         .price-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -140,7 +139,6 @@
             color: #fff;
         }
 
-        /* --- ПРОФИЛЬ --- */
         .profile-header {
             display: flex;
             align-items: center;
@@ -162,6 +160,13 @@
             font-size: 28px;
             font-weight: 700;
             color: #0a0a14;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .profile-info h2 {
             font-size: 18px;
@@ -239,7 +244,6 @@
             color: #444466;
         }
 
-        /* --- ПОРТФЕЛЬ (заглушка) --- */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -255,7 +259,6 @@
             font-size: 16px;
         }
 
-        /* --- НИЖНЯЯ НАВИГАЦИЯ --- */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -301,14 +304,13 @@
             border-radius: 4px;
         }
 
-        /* --- АДАПТИВ --- */
         @media (max-width: 400px) {
             .price-card .value {
                 font-size: 18px;
             }
             .profile-header {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                text-align: left;
             }
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
@@ -345,7 +347,6 @@
             <button class="refresh-btn" onclick="fetchData()">🔄 Обновить</button>
         </div>
 
-        <!-- виджет цели (оставим для мотивации) -->
         <div class="stat-card" style="margin-top:4px;">
             <div class="label">🎯 Цель: переезд в Москву</div>
             <div class="num" id="goalProgress" style="font-size:18px;">15 000 / 100 000 ₽</div>
@@ -360,7 +361,7 @@
         <div class="profile-header">
             <div class="avatar" id="userAvatar">👤</div>
             <div class="profile-info">
-                <h2 id="userName">Трейдер</h2>
+                <h2 id="userName">Загрузка...</h2>
                 <div class="level" id="userLevelDisplay">📊 Уровень: Новичок</div>
                 <span class="level-badge" id="userLevelBadge2">⚡ 0 XP</span>
             </div>
@@ -428,6 +429,42 @@
 
     <script>
         // ============================================================
+        // 0. ПОЛУЧАЕМ ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ИЗ TELEGRAM
+        // ============================================================
+        let tgUser = null;
+
+        function initTelegramUser() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const data = window.Telegram.WebApp.initDataUnsafe;
+                    if (data && data.user) {
+                        tgUser = data.user;
+                        console.log('Пользователь из Telegram:', tgUser);
+                        return tgUser;
+                    }
+                }
+                // Если запущено не в Telegram — заглушка
+                tgUser = {
+                    id: 123456,
+                    first_name: 'Тест',
+                    last_name: 'Пользователь',
+                    username: 'test_user',
+                    language_code: 'ru',
+                    allows_write_to_pm: true,
+                };
+                return tgUser;
+            } catch (e) {
+                console.warn('Не удалось получить данные Telegram:', e);
+                tgUser = {
+                    id: 123456,
+                    first_name: 'Гость',
+                    username: 'guest',
+                };
+                return tgUser;
+            }
+        }
+
+        // ============================================================
         // 1. НАСТРОЙКИ
         // ============================================================
         const LEVELS = [
@@ -437,7 +474,7 @@
             { name: 'Ультра', xpNeeded: 20000 },
         ];
 
-        // Данные пользователя (сохраняются в localStorage)
+        // Данные пользователя (сохраняются в localStorage по ID)
         let userData = {
             xp: 0,
             trades: 0,
@@ -445,9 +482,14 @@
             profit: 0,
         };
 
-        // Загружаем сохранённые данные
+        function getStorageKey() {
+            const id = tgUser ? tgUser.id : 'guest';
+            return 'cryptoAnalyst_' + id;
+        }
+
         function loadUserData() {
-            const saved = localStorage.getItem('cryptoAnalystUser');
+            const key = getStorageKey();
+            const saved = localStorage.getItem(key);
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -457,7 +499,8 @@
         }
 
         function saveUserData() {
-            localStorage.setItem('cryptoAnalystUser', JSON.stringify(userData));
+            const key = getStorageKey();
+            localStorage.setItem(key, JSON.stringify(userData));
         }
 
         // ============================================================
@@ -494,8 +537,20 @@
             const level = getLevel(userData.xp);
             const next = getNextLevel(userData.xp);
 
-            // Имя и уровень
-            document.getElementById('userName').textContent = 'Трейдер';
+            // Имя пользователя из Telegram
+            const firstName = tgUser ? tgUser.first_name : 'Гость';
+            const lastName = tgUser && tgUser.last_name ? ' ' + tgUser.last_name : '';
+            document.getElementById('userName').textContent = firstName + lastName;
+
+            // Аватарка
+            const avatarEl = document.getElementById('userAvatar');
+            if (tgUser && tgUser.photo_url) {
+                avatarEl.innerHTML = `<img src="${tgUser.photo_url}" alt="avatar" />`;
+            } else {
+                avatarEl.textContent = firstName.charAt(0).toUpperCase() || '👤';
+            }
+
+            // Уровень
             document.getElementById('userLevelDisplay').textContent = `📊 Уровень: ${level.name}`;
             document.getElementById('userLevelBadge').textContent = level.name;
             document.getElementById('userLevelBadge2').textContent = `⚡ ${userData.xp} XP`;
@@ -517,7 +572,7 @@
             }
 
             // Обновляем цель на главной
-            const saved = 15000; // можно заменить на реальные данные
+            const saved = 15000;
             const target = 100000;
             document.getElementById('goalProgress').textContent = `${saved.toLocaleString()} / ${target.toLocaleString()} ₽`;
             document.getElementById('goalFill').style.width = Math.min((saved / target) * 100, 100) + '%';
@@ -540,7 +595,6 @@
 
             updateProfile();
 
-            // Визуальный фидбек
             const btn = document.querySelector('.refresh-btn');
             const orig = btn.textContent;
             btn.textContent = `✅ +${xpGain} XP!`;
@@ -552,7 +606,7 @@
         }
 
         // ============================================================
-        // 5. КРИПТО-ДАННЫЕ (как было)
+        // 5. КРИПТО-ДАННЫЕ
         // ============================================================
         let chartInstance = null;
 
@@ -660,8 +714,14 @@
         // ============================================================
         // 7. ЗАПУСК
         // ============================================================
+        // Инициализируем пользователя Telegram
+        initTelegramUser();
+
+        // Загружаем сохранённые данные (у каждого пользователя свои!)
         loadUserData();
         updateProfile();
+
+        // Загружаем цены
         fetchData();
         setInterval(fetchData, 5 * 60 * 1000);
     </script>
